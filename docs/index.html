@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <title>Bangalore Music Strip - Interactive Gallery Experience</title>
+    <meta name="description" content="Explore an immersive parallax gallery featuring interactive photo frames in a virtual room environment" />
+    <meta name="keywords" content="bangalore, music, interactive gallery, 3d experience, photo frames, parallax" />
+    
+    <!-- Performance Optimizations -->
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#1a1a1a" />
+    
+
+    
+    <!-- Performance Hints -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    
+    <!-- Prevent Flash of Unstyled Content -->
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #1a1a1a;
+        overflow: hidden;
+      }
+      
+      #root {
+        width: 100vw;
+        height: 100vh;
+      }
+      
+      /* Loading spinner while assets load */
+      .loading-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255,255,255,0.1);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        z-index: 9999;
+      }
+      
+      @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-ClgpPIjR.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CZHfzxDU.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Optional: Add error boundary for production -->
+    <script>
+      window.addEventListener('error', function(e) {
+        console.error('Application error:', e.error);
+      });
+      
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+      });
+    </script>
+  </body>
+</html>

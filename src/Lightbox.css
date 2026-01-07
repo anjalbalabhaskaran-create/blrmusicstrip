@@ -5,24 +5,95 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.2); /* Subtle translucent background around lightbox */
+  backdrop-filter: blur(1px);
   z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.lightbox-container {
+  display: block; /* Change to block layout */
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 50px; /* Space from top */
+  min-height: 100vh; /* Ensure full height */
 }
 
 .lightbox-video {
+  width: 100%;
   max-width: 100%;
-  max-height: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 30px auto; /* Add bottom margin for spacing */
+  border-radius: 8px;
+}
+
+/* Horizontal band matching lightbox theme */
+.participants-band {
+  background: rgba(20, 20, 20, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px;
+  padding: 25px;
+  margin: 0 auto 30px auto;
+  max-height: 350px;
+  overflow-y: auto;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  display: block;
+}
+
+.band-title {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 10px;
+}
+
+.band-content {
+  color: white;
+  line-height: 1.6;
+}
+
+.text-line {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 6px;
+  padding: 3px 0;
+  line-height: 1.5;
+}
+
+/* Custom scrollbar for dark theme */
+.participants-band::-webkit-scrollbar {
+  width: 8px;
+}
+
+.participants-band::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.participants-band::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+}
+
+.participants-band::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .lightbox-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
+  top: clamp(15px, 3vw, 25px);
+  right: clamp(15px, 3vw, 25px);
+  width: clamp(40px, 6vw, 60px);
+  height: clamp(40px, 6vw, 60px);
   background: rgba(255, 255, 255, 0.9);
   border: 2px solid black;
   border-radius: 50%;
@@ -34,7 +105,7 @@
   justify-content: center;
   transition: all 0.2s ease;
   backdrop-filter: blur(4px);
-  font-size: 20px;
+  font-size: clamp(16px, 3vw, 24px);
   font-weight: bold;
 }
 
@@ -48,6 +119,123 @@
 }
 
 .lightbox-close svg {
-  width: 20px;
-  height: 20px;
+  width: clamp(16px, 3vw, 24px);
+  height: clamp(16px, 3vw, 24px);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .lightbox-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+  
+  .lightbox-container {
+    gap: 10px;
+    max-height: none;
+    width: 100%;
+  }
+  
+  .lightbox-video {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+  
+  .lightbox-close {
+    top: 15px;
+    right: 15px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .participants-band {
+    padding: 15px;
+    max-height: 250px;
+    margin-top: 15px;
+  }
+
+  .band-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .text-line {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+}
+
+/* Tablet-specific styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .lightbox-container {
+    max-height: none;
+    max-width: 85vw;
+  }
+  
+  .lightbox-video {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .participants-band {
+    max-height: 350px;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .lightbox-overlay {
+    align-items: flex-start;
+    padding: 10px;
+  }
+  
+  .lightbox-container {
+    flex-direction: row;
+    gap: 15px;
+    max-height: 90vh;
+    width: 100%;
+  }
+  
+  .lightbox-video {
+    max-width: 60vw;
+    flex-shrink: 0;
+  }
+  
+  .lightbox-close {
+    top: 5px;
+    right: 5px;
+  }
+
+  .participants-band {
+    flex: 1;
+    max-height: 80vh;
+    min-width: 300px;
+    margin-top: 0;
+    margin-left: 15px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+  .lightbox-overlay {
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  
+  .lightbox-container {
+    max-width: 80vw;
+    max-height: none;
+  }
+  
+  .lightbox-video {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .participants-band {
+    max-height: 400px;
+  }
 }

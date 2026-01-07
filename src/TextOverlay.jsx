@@ -7,7 +7,7 @@ const paragraphs = [
   { 
     content: (
       <>
-        <strong>Scroll up and down</strong> through the cityscape. The past stretches wide and each surreal detail is a door to a sonic memory. Look for <strong>unusually colored objects</strong>. Jukeboxes, radios, newspapers, amplifiers. And <strong>click</strong> to uncover the rhythms they've been saving just for you.
+        <strong><span style={{ color: '#000000' }}>Scroll up and down</span></strong> through the cityscape. The past stretches wide and each surreal detail is a door to a sonic memory. Look for <strong><span style={{ color: '#800000' }}>8 unusually coloured objects</span></strong>. Jukeboxes, radios, newspapers, amplifiers. And <strong><span style={{ color: '#000000' }}>click</span></strong> to uncover the rhythms they've been saving just for you.
       </>
     ), 
     style: { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' } 

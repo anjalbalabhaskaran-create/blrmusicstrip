@@ -24,6 +24,7 @@ const MusicStripModel = forwardRef(({ onVideoTrigger }, ref) => {
   const camera = useThree((s) => s.camera);
 
   const meshRefs = useRef({});
+  const allMeshRefs = useRef({}); // Store ALL meshes for saturation control
   const videoMeshes = useRef({});
   const rootGroup = useRef();
 
@@ -62,6 +63,20 @@ const MusicStripModel = forwardRef(({ onVideoTrigger }, ref) => {
         child.material.depthWrite = false;
       }
 
+      // Collect ALL meshes for saturation control (except hidden ones)
+      if (!lname.includes("floor") && 
+          !lname.includes("ground") && 
+          !lname.includes("plane") && 
+          !lname.includes("base") && 
+          child.position.y >= -2) {
+        // Clone material to avoid affecting other instances
+        if (child.material) {
+          const mat = child.material.clone();
+          child.material = mat;
+          allMeshRefs.current[name] = child;
+        }
+      }
+
       // Collect and prep fadeable meshes
       if (TARGET_MESHES.includes(name)) {
         const mat = child.material.clone();
@@ -74,7 +89,7 @@ const MusicStripModel = forwardRef(({ onVideoTrigger }, ref) => {
       // Collect video clickable meshes - more flexible matching
       if (VIDEO_MESHES.includes(name)) {
         videoMeshes.current[name] = child;
-        child.userData.videoIndex = Number(name.replace('P', '')) - 1; // P1 -> 0, P2 -> 1, etc.
+        child.userData.videoIndex = Number(name.replace('P', '')); // P1 -> 1, P2 -> 2, etc.
         
         console.log(`🎬 Setup: ${name} assigned videoIndex ${child.userData.videoIndex}`);
         
@@ -143,6 +158,108 @@ const MusicStripModel = forwardRef(({ onVideoTrigger }, ref) => {
         },
       });
     },
+    setSaturation: (meshName, saturation) => {
+      const mesh = meshRefs.current[meshName];
+      if (!mesh || !mesh.material) return;
+
+      // Store original color if not already stored
+      if (!mesh.userData.originalColor) {
+        mesh.userData.originalColor = mesh.material.color.clone();
+      }
+
+      // Create a temporary color to work with
+      const color = mesh.userData.originalColor.clone();
+      
+      // Convert to HSL, modify saturation, convert back to RGB
+      const hsl = {};
+      color.getHSL(hsl);
+      
+      // Apply saturation multiplier (1.0 = normal, 2.0 = double saturation, 0.0 = grayscale)
+      hsl.s = Math.min(1.0, hsl.s * saturation);
+      
+      // Set the new color
+      color.setHSL(hsl.h, hsl.s, hsl.l);
+      mesh.material.color.copy(color);
+    },
+    setGlobalSaturation: (saturation, excludeMeshes = []) => {
+      // Apply saturation to all meshes except those in excludeMeshes array
+      Object.entries(allMeshRefs.current).forEach(([meshName, mesh]) => {
+        if (excludeMeshes.includes(meshName)) return;
+        if (!mesh || !mesh.material || !mesh.material.color) return;
+
+        // Store original color if not already stored
+        if (!mesh.userData.originalColor) {
+          mesh.userData.originalColor = mesh.material.color.clone();
+        }
+
+        // Create a temporary color to work with
+        const color = mesh.userData.originalColor.clone();
+        
+        // Convert to HSL, modify saturation, convert back to RGB
+        const hsl = {};
+        color.getHSL(hsl);
+        
+        // Apply saturation multiplier
+        hsl.s = Math.min(1.0, hsl.s * saturation);
+        
+        // Set the new color
+        color.setHSL(hsl.h, hsl.s, hsl.l);
+        mesh.material.color.copy(color);
+      });
+    },
+    setPulsing: (meshName, shouldPulse) => {
+      const mesh = meshRefs.current[meshName];
+      console.log(`🔄 setPulsing called for ${meshName}, shouldPulse: ${shouldPulse}, mesh found: ${!!mesh}`);
+      
+      if (!mesh) {
+        console.log(`❌ Mesh ${meshName} not found in meshRefs.current:`, Object.keys(meshRefs.current));
+        return;
+      }
+
+      // Kill any existing pulse animation
+      gsap.killTweensOf(mesh.scale);
+      console.log(`🎯 Killed existing tweens for ${meshName}`);
+
+      if (shouldPulse) {
+        // Store original scale if not already stored
+        if (!mesh.userData.originalScale) {
+          mesh.userData.originalScale = { x: mesh.scale.x, y: mesh.scale.y, z: mesh.scale.z };
+          console.log(`📏 Stored original scale for ${meshName}:`, mesh.userData.originalScale);
+        }
+
+        console.log(`✨ Starting firefly-like pulse animation for ${meshName}`);
+        // Create very slow, gentle firefly-like pulsing animation
+        gsap.to(mesh.scale, {
+          x: mesh.userData.originalScale.x * 1.02, // Even more subtle 2% larger
+          y: mesh.userData.originalScale.y * 1.02,
+          z: mesh.userData.originalScale.z * 1.02,
+          duration: 6.0, // Much slower - 6 seconds each way (12 second full cycle)
+          ease: 'sine.inOut', // Gentle, natural easing like firefly breathing
+          yoyo: true,
+          repeat: -1, // Infinite repeat
+          onStart: () => console.log(`🪲 Very slow firefly pulse animation started for ${meshName}`),
+          onUpdate: () => {
+            // Only log every 30th update to avoid spam
+            if (Math.random() < 0.03) {
+              console.log(`🌟 Slow firefly pulsing ${meshName}, current scale:`, mesh.scale.x.toFixed(4));
+            }
+          }
+        });
+      } else {
+        // Restore original scale
+        if (mesh.userData.originalScale) {
+          console.log(`🔄 Very gently restoring original scale for ${meshName}`);
+          gsap.to(mesh.scale, {
+            x: mesh.userData.originalScale.x,
+            y: mesh.userData.originalScale.y,
+            z: mesh.userData.originalScale.z,
+            duration: 2.5, // Even slower, very gentle restoration
+            ease: 'sine.out', // Gentle easing to match firefly theme
+            onComplete: () => console.log(`✅ Scale very gently restored for ${meshName}`)
+          });
+        }
+      }
+    },
   }));
 
   const handlePointerDown = useCallback(
@@ -185,7 +302,7 @@ const MusicStripModel = forwardRef(({ onVideoTrigger }, ref) => {
   );
 
   return (
-    <group ref={rootGroup} position={[0, 0, 0]} scale={1} onPointerDown={handlePointerDown}>
+    <group ref={rootGroup} position={[0, 0, 0]} scale={1} onPointerDown={handlePointerDown} pointerEvents="none">
       <primitive object={clonedScene} />
       <CloudsLayer />
       {/* <TreeWorld camera={camera} /> */}

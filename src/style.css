@@ -19,6 +19,8 @@ body {
 /* Canvas fills the entire screen */
 canvas {
   display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Hide scrollbars but keep scroll functionality */
@@ -26,25 +28,31 @@ canvas {
   display: none;
 }
 
-/* Instructions overlay */
+/* Make sure everything is responsive */
+* {
+  box-sizing: border-box;
+}
+
+/* Instructions overlay - responsive */
 .instructions {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: clamp(10px, 2vw, 20px);
+  left: clamp(10px, 2vw, 20px);
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 15px;
+  padding: clamp(10px, 2vw, 15px);
   border-radius: 8px;
-  font-size: 12px;
+  font-size: clamp(10px, 1.5vw, 14px);
   font-family: monospace;
   z-index: 1000;
-  max-width: 300px;
+  max-width: clamp(250px, 40vw, 350px);
   backdrop-filter: blur(10px);
 }
 
 .instructions h3 {
   margin: 0 0 10px 0;
   color: #00ff88;
+  font-size: clamp(12px, 2vw, 16px);
 }
 
 .instructions ol {
@@ -72,25 +80,82 @@ canvas {
   width: 100%;
   text-align: center;
   top: 40vh;
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 3rem); /* Responsive font size */
   color: white;
   opacity: 0;
   transition: opacity 0.3s ease;
+  padding: 0 clamp(10px, 3vw, 20px); /* Responsive padding */
 }
 
-
-/* Progress indicator */
+/* Progress indicator - responsive */
 .progress {
   position: fixed;
-  bottom: 20px;
+  bottom: clamp(10px, 2vh, 20px);
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 10px 20px;
+  padding: clamp(8px, 1.5vw, 12px) clamp(12px, 3vw, 20px);
   border-radius: 20px;
-  font-size: 11px;
+  font-size: clamp(9px, 1.5vw, 13px);
   font-family: monospace;
   z-index: 1000;
   backdrop-filter: blur(10px);
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .instructions {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    max-width: none;
+    font-size: 10px;
+    padding: 8px;
+  }
+  
+  .text-on-scroll {
+    font-size: clamp(1.2rem, 6vw, 2rem);
+    top: 35vh;
+  }
+  
+  .progress {
+    bottom: 5px;
+    font-size: 9px;
+    padding: 6px 12px;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .instructions {
+    font-size: 11px;
+    max-width: 280px;
+  }
+  
+  .text-on-scroll {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .instructions {
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    padding: 6px;
+    font-size: 9px;
+  }
+  
+  .text-on-scroll {
+    top: 30vh;
+    font-size: clamp(1rem, 5vw, 1.8rem);
+  }
+  
+  .progress {
+    bottom: 2px;
+    font-size: 8px;
+    padding: 4px 8px;
+  }
 }

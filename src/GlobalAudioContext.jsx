@@ -104,8 +104,8 @@ export const GlobalAudioProvider = ({ children }) => {
         playAudio(); // Ensure audio is playing
         break;
       case 'experience':
-        console.log(`🎵 Playing Intro music.m4a for experience at volume 0.4`);
-        setVolumeLevel(0.4); // Lower volume for experience page
+        console.log(`🎵 Playing Intro music.m4a for experience at volume 0.2`);
+        setVolumeLevel(0.2); // Much lower volume for experience page
         playAudio(); // Ensure audio is playing
         break;
       case 'musicstrip':

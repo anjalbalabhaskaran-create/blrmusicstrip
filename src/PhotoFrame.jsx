@@ -4,6 +4,7 @@ import { useState, Suspense, useEffect, useRef } from 'react'
 import { photoFrameData } from './photoFrameData'
 import Lightbox3D from './Lightbox3D'
 import * as THREE from 'three'
+import { useNavigate } from 'react-router-dom';
 
 // Individual Frame Component with clickable box
 function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, clickableDepth, clickableOffsetX, clickableOffsetY, showClickableArea }) {
@@ -59,8 +60,9 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
   )
 }
 
-const PhotoFrame = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) => {
+const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) => {
   const [selectedFrame, setSelectedFrame] = useState(null)
+  const navigate = useNavigate();
   
   // Fixed: Hide clickable areas (no more Leva control)
   const showClickableArea = false;
@@ -338,4 +340,4 @@ for (let i = 1; i <= 15; i++) {
   useGLTF.preload(`/models/p${i}.glb`)
 }
 
-export default PhotoFrame
+export default PhotoFrameContainer

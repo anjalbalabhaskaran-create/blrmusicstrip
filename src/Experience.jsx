@@ -20,32 +20,43 @@ const Experience = () => {
   // Music strip hover state
   const [isMusicStripHovered, setIsMusicStripHovered] = useState(false);
 
-  // Fixed values for B0 layer (from Leva controls - final values)
-  const b0Controls = {
-    b0Scale: 0.80,
-    b0X: -388,
-    b0Y: -204,
-    b0ParallaxX: 17.4,
-    b0ParallaxY: 16.9,
-    b0Opacity: 1.0,
+  // Fixed values for Intro TV Video (from Leva controls - final values)
+  const videoConfig = {
+    x: 30, // px offset (from Leva)
+    y: -52, // px offset (from Leva)
+    width: 14.0, // vw (from Leva)
+    height: 19.2, // vh (from Leva)
+    scale: 1.13, // scale factor (from Leva)
+    volume: 1.00, // audio volume (from Leva)
+    objectFit: 'cover',
   };
 
-  // Fixed values for text layer (between B0 and B1) - hover text
+  // Fixed values for B0 layer
+  const b0Controls = {
+    b0Scale: 0.93,
+    b0X: -423,
+    b0Y: -314,
+    b0ParallaxX: 50.0,
+    b0ParallaxY: 50.0,
+    b0Opacity: 1.00,
+  };
+
+  // Fixed values for Text Layer (restored for visibility)
   const textControls = {
-    textX: 116, // Fixed value
-    textY: 16, // Fixed value
-    textScale: 0.58,
+    textX: 73,
+    textY: 16,
+    textScale: 0.68,
     textParallaxX: 11.0,
     textParallaxY: 11.2,
     textFontSize: 24,
     textColor: '#000000',
-    textContent: 'Click to start the stroll\nthrough the memories',
     textOpacity: 1.00,
     textFontWeight: 100,
     textMaxWidth: 600,
   };
+  const textContent = 'Click to start the stroll\nthrough the memories';
 
-  // Final constant values for all parallax layers (from Leva panel)
+  // Original values for all parallax layers
   const b1Controls = {
     b1Scale: 1.6,
     b1X: 15,
@@ -55,14 +66,6 @@ const Experience = () => {
     b1Opacity: 1.0,
   }
 
-  // Fixed values for group scale, x, y (Leva removed)
-  const groupScale = 0.33;
-  const globalX = 0.69;
-  const globalY = 0.32;
-
-
-  // Leva controls for B2 layer
-  // Final fixed values for B2 layer (Y value fixed from Leva)
   const b2Controls = {
     b2Scale: 1.15,
     b2X: -27,
@@ -72,27 +75,22 @@ const Experience = () => {
     b2Opacity: 1.0,
   }
 
-  // Fixed values for video background (Leva removed)
-  const videoConfig = {
-    x: 26, // px offset (from Leva)
-    y: -46, // px offset (from Leva)
-    width: 14.0, // vw (from Leva)
-    height: 18.0, // vh (from Leva)
-    scale: 1.1, // scale factor (from Leva)
-    volume: 0.5, // audio volume (from Leva)
-    objectFit: 'cover',
-  }
-
+  // Fixed values for B3 layer (restored for visibility)
   const b3Controls = {
     b3Scale: 0.8,
     b3X: -160,
-    b3Y: 91, // Fixed value
+    b3Y: 91,
     b3ParallaxX: 2,
     b3ParallaxY: 2,
     b3Opacity: 1.0,
   }
 
-  // Fixed MusicStrip Button values from Leva panel
+  // Responsive values for PhotoFrame and video
+  const groupScale = 0.33;
+  const globalX = 0.69;
+  const globalY = 0.32;
+
+  // Original MusicStrip Button values from Leva panel
   const musicBtnStyle = {
     width: 252,
     height: 480,
@@ -112,7 +110,7 @@ const Experience = () => {
     pointerEvents: 'auto',
   };
 
-  // Fixed TV Button values (from Leva controls)
+  // Original TV Button values (from Leva controls)
   const rectButtonControls = {
     width: 340,
     height: 250,
@@ -128,7 +126,7 @@ const Experience = () => {
     fontSize: 16,
   };
 
-  // Fixed zoom transition values (from Leva controls)
+  // Original zoom transition values (from Leva controls)
   const zoomControls = {
     zoomScale: 5.0,
     zoomCenterX: 15,
@@ -312,7 +310,7 @@ const Experience = () => {
           transition: isZoomed 
             ? `opacity ${zoomControls.transitionDuration}ms ease-in-out`
             : 'opacity 0ms',
-          position: 'absolute',
+            position: 'absolute',
         }}
       >
         <img 
@@ -346,7 +344,7 @@ const Experience = () => {
           whiteSpace: 'pre-line',
         }}
       >
-        {textControls.textContent}
+        {textContent}
         
         {/* Creative UI Elements - Simple & Minimal */}
         <div 
@@ -390,6 +388,29 @@ const Experience = () => {
         button, .musicstrip-btn {
           cursor: pointer !important;
         }
+        
+        /* Ensure proper scrolling behavior */
+        .experience-container {
+          box-sizing: border-box;
+        }
+        
+        .experience-container::-webkit-scrollbar {
+          width: 12px;
+          height: 12px;
+        }
+        
+        .experience-container::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .experience-container::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 6px;
+        }
+        
+        .experience-container::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.5);
+        }
       `}</style>
 
       {/* Background Layer (B1.png) */}
@@ -403,7 +424,7 @@ const Experience = () => {
           transition: isZoomed 
             ? `opacity ${zoomControls.transitionDuration}ms ease-in-out`
             : 'opacity 0ms',
-          position: 'absolute',
+            position: 'absolute',
         }}
       >
         <img 
@@ -434,7 +455,7 @@ const Experience = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            zIndex: 0,
+            zIndex: 0, // Video is behind B2 image
             pointerEvents: 'none',
             overflow: 'hidden',
           }}
@@ -455,16 +476,16 @@ const Experience = () => {
               objectFit: videoConfig.objectFit,
               zIndex: 0,
               pointerEvents: 'auto', // allow video to play
+              background: 'black',
             }}
             volume={videoConfig.volume}
             onLoadedData={e => { 
               e.target.play(); 
               e.target.volume = videoConfig.volume;
-              console.debug('Video loaded with audio:', '/video/tvintro.webm, /video/tvintro.mp4', 'Volume:', videoConfig.volume) 
+              console.debug('Video loaded with audio:', '/video/tvintro.webm', 'Volume:', videoConfig.volume) 
             }}
           >
             <source src="/video/tvintro.webm" type="video/webm" />
-            <source src="/video/tvintro.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
@@ -490,7 +511,7 @@ const Experience = () => {
           transition: isZoomed 
             ? `opacity ${zoomControls.transitionDuration}ms ease-in-out`
             : 'opacity 0ms',
-          position: 'absolute',
+            position: 'absolute',
         }}
       >
         <img 
@@ -505,7 +526,9 @@ const Experience = () => {
 
       {/* Photo Frames */}
       <div>
-        <PhotoFrame globalX={globalX} globalY={globalY} groupScale={groupScale} />
+        {[...Array(15)].map((_, idx) => (
+          <PhotoFrame key={idx + 1} id={idx + 1} globalX={globalX} globalY={globalY} groupScale={groupScale} />
+        ))}
       </div>
 
       {/* Content overlay for future frame positioning */}

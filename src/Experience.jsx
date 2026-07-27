@@ -152,7 +152,7 @@ const Experience = () => {
 
   const handleImageError = (imageName) => {
     console.error(`Failed to load image: ${imageName}`)
-    console.error(`Full path attempted: /parallax/${imageName}`)
+    console.error(`Full path attempted: parallax/${imageName}`)
     setHasError(true)
   }
 
@@ -314,7 +314,7 @@ const Experience = () => {
         }}
       >
         <img 
-          src="/parallax/B0.jpg"
+          src="parallax/B0.jpg"
           alt="B0 Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B0.jpg')}
@@ -428,7 +428,7 @@ const Experience = () => {
         }}
       >
         <img 
-          src="/parallax/B1.png" 
+          src="parallax/B1.png" 
           alt="Background Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B1.png')}
@@ -482,16 +482,16 @@ const Experience = () => {
             onLoadedData={e => { 
               e.target.play(); 
               e.target.volume = videoConfig.volume;
-              console.debug('Video loaded with audio:', '/video/tvintro.webm', 'Volume:', videoConfig.volume) 
+              console.debug('Video loaded with audio:', 'video/tvintro.webm', 'Volume:', videoConfig.volume) 
             }}
           >
-            <source src="/video/tvintro.webm" type="video/webm" />
+            <source src="video/tvintro.webm" type="video/webm" />
             Your browser does not support the video tag.
           </video>
         </div>
         {/* B2 image above video */}
         <img 
-          src="/parallax/B2.png" 
+          src="parallax/B2.png" 
           alt="Middle Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B2.png')}
@@ -515,7 +515,7 @@ const Experience = () => {
         }}
       >
         <img 
-          src="/parallax/B3.png" 
+          src="parallax/B3.png" 
           alt="Front Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B3.png')}

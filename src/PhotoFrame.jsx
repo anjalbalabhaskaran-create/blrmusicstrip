@@ -1,6 +1,6 @@
 import { Canvas, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
-import { useState, Suspense, useEffect, useRef } from 'react'
+import { useState, useMemo, Suspense, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { photoFrameData } from './photoFrameData'
 import Lightbox3D from './Lightbox3D'
@@ -15,6 +15,22 @@ function Frame({ id, position, scale, onClick }) {
   const { scene } = useGLTF(getAssetPath(`/models/p${id}.glb`))
   const [isHovered, setIsHovered] = useState(false)
 
+  // Every model here is built from two shared meshes: "Plane" (the photo) and
+  // "frame1(1)" (the wooden border). The border mesh's per-model transform is
+  // inconsistent across files - it ranges from 1x up to a flipped -4.27x scale
+  // on some frames - which let its raycastable surface extend well past what's
+  // visually obvious as "the frame" on certain photos. The photo mesh's transform
+  // is far more consistent, so restrict hover/click to it alone.
+  const clonedScene = useMemo(() => {
+    const cloned = scene.clone()
+    cloned.traverse((child) => {
+      if (child.isMesh && !/plane/i.test(child.name)) {
+        child.raycast = () => null
+      }
+    })
+    return cloned
+  }, [scene])
+
   const handleClick = (e) => {
     e.stopPropagation();
     onClick(id);
@@ -26,7 +42,7 @@ function Frame({ id, position, scale, onClick }) {
   return (
     <group position={position}>
       <primitive
-        object={scene.clone()}
+        object={clonedScene}
         scale={[effectiveScale, effectiveScale, effectiveScale]}
         rotation={[Math.PI / 2, 0, 0]} // Default: flat
         onClick={handleClick}

@@ -27,7 +27,11 @@ function Frame({ id, position, scale, onClick, showClickableArea }) {
     const box = new THREE.Box3().setFromObject(scene)
     const size = box.getSize(new THREE.Vector3())
     const center = box.getCenter(new THREE.Vector3())
-    setBoxSize([size.x || 1, size.y || 1, Math.max(size.z, 0.05)])
+    // Shrink the hitbox somewhat from the model's full raw bounding box: frames are
+    // packed closely enough on the wall that some models' raw geometry is wide enough
+    // for the hitbox to bleed into a neighboring frame's space at full size.
+    const shrink = 0.7
+    setBoxSize([(size.x || 1) * shrink, (size.y || 1) * shrink, Math.max(size.z, 0.05)])
     setBoxCenter([center.x, center.y, center.z])
   }, [scene])
 

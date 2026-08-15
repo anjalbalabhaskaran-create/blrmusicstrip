@@ -146,12 +146,21 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
             // real diagnostic data instead of further guessing.
             zoom: 4
           }}
+          // r3f measures this element's size (via a ResizeObserver-based hook) to set up
+          // both the WebGL drawing buffer AND the camera frustum. A percentage size (100%)
+          // makes that measurement depend on the parent's layout resolving first, which is
+          // asynchronous and was observed taking multiple seconds (canvas stuck at the
+          // browser's 300x150 default the whole time - no working raycasts until it
+          // resolved). This box is always exactly 1512x982 in its own layout space
+          // regardless of viewport (the ancestor's CSS transform handles all visual
+          // scaling separately), so sizing it with fixed pixel values removes that
+          // dependency entirely.
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
+            width: 1512,
+            height: 982,
             zIndex: 2
           }}
         >

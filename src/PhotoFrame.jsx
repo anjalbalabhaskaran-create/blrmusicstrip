@@ -176,6 +176,13 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
               const xKey = `f${frame.id}_x`
               const yKey = `f${frame.id}_y`
 
+              const clickableWidth = controls[widthKey] * controls[scaleKey] * groupScale
+              // The hitbox's true center consistently sits to the left of the visible
+              // picture (confirmed directly: clicking on the empty wall to the left of a
+              // frame still opens that same frame). Shifting right by half the box's own
+              // width moves what was its left edge to become its new center.
+              const clickableOffsetX = controls[xKey] * groupScale + clickableWidth / 2
+
               return (
                 <Frame
                   key={frame.id}
@@ -183,10 +190,10 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
                   position={[frame.x * groupScale + globalX, frame.y * groupScale + globalY, frame.z]}
                   scale={frame.scale * groupScale}
                   onClick={handleFrameClick}
-                  clickableWidth={controls[widthKey] * controls[scaleKey] * groupScale}
+                  clickableWidth={clickableWidth}
                   clickableHeight={controls[heightKey] * controls[scaleKey] * groupScale}
                   clickableDepth={controls[depthKey] * controls[scaleKey] * groupScale}
-                  clickableOffsetX={controls[xKey] * groupScale}
+                  clickableOffsetX={clickableOffsetX}
                   clickableOffsetY={controls[yKey] * groupScale}
                   showClickableArea={showClickableArea}
                 />

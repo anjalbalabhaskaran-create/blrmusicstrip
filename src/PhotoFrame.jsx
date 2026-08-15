@@ -59,7 +59,7 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
   )
 }
 
-const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) => {
+const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, stageScale = 1 }) => {
   const [selectedFrame, setSelectedFrame] = useState(null)
   const navigate = useNavigate();
 
@@ -139,7 +139,16 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) =
             near: 0.1,
             far: 1000,
             orthographic: true,
-            zoom: 4 // Lower zoom to make frames visible
+            // R3F sizes the camera frustum from the canvas's own post-transform visual
+            // size (getBoundingClientRect), so 1 world unit maps to a fixed number of REAL
+            // screen pixels, independent of the stage's CSS scale - while every 2D layer
+            // around it (room image, buttons) scales WITH that same transform. They only
+            // coincidentally agree at the exact 1512x982 design resolution. Multiplying
+            // zoom by the current stage scale keeps world units at a constant number of
+            // design-space pixels regardless of viewport size, matching everything else.
+            // Confirmed via real-browser testing: Safari showed frame hitboxes visibly
+            // offset from the pictures at non-1:1 scale, exactly matching this mismatch.
+            zoom: 4 * Math.max(stageScale, 0.01)
           }}
           style={{
             position: 'absolute',

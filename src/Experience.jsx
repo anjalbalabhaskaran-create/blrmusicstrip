@@ -573,7 +573,7 @@ const Experience = () => {
       {/* Photo Frames */}
       <div>
         {[...Array(15)].map((_, idx) => (
-          <PhotoFrame key={idx + 1} id={idx + 1} globalX={globalX} globalY={globalY} groupScale={groupScale} />
+          <PhotoFrame key={idx + 1} id={idx + 1} globalX={globalX} globalY={globalY} groupScale={groupScale} stageScale={scale} />
         ))}
       </div>
 

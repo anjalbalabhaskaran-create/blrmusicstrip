@@ -570,12 +570,14 @@ const Experience = () => {
 
 
 
-      {/* Photo Frames */}
-      <div>
-        {[...Array(15)].map((_, idx) => (
-          <PhotoFrame key={idx + 1} id={idx + 1} globalX={globalX} globalY={globalY} groupScale={groupScale} stageScale={scale} />
-        ))}
-      </div>
+      {/* Photo Frames - PhotoFrame renders all 15 frames itself (in one shared Canvas/
+          WebGL context), so it's mounted once here, not looped. It used to be rendered
+          15 times in a row, each instance independently drawing all 15 frames inside its
+          own Canvas (the `id` prop was never actually read by the component) - 15 fully
+          overlapping WebGL contexts each loading all 15 models redundantly. That's very
+          likely why Firefox (a much lower simultaneous-context limit than Chrome) failed
+          outright while Chrome merely struggled. */}
+      <PhotoFrame globalX={globalX} globalY={globalY} groupScale={groupScale} stageScale={scale} />
 
       {/* Content overlay for future frame positioning */}
       <div className="content-overlay" style={{ pointerEvents: 'none' }}>

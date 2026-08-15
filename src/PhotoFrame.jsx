@@ -8,8 +8,10 @@ import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom';
 import { getAssetPath } from './utils/assetPath'
 
-// Individual Frame Component with clickable box
-function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, clickableDepth, clickableOffsetX, clickableOffsetY, showClickableArea }) {
+// Individual Frame Component - the visible model itself is the clickable/hoverable
+// surface (no separate invisible hitbox mesh), so there's nothing that can ever drift
+// out of alignment with what's actually shown.
+function Frame({ id, position, scale, onClick }) {
   const { scene } = useGLTF(getAssetPath(`/models/p${id}.glb`))
   const [isHovered, setIsHovered] = useState(false)
 
@@ -18,16 +20,15 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
     onClick(id);
   };
 
-  // Calculate the effective scale - 1.2x for any frame when hovered, 1x otherwise
-  const effectiveScale = isHovered ? scale * 1.2 : scale;
+  // Calculate the effective scale - 1.1x for any frame when hovered, 1x otherwise
+  const effectiveScale = isHovered ? scale * 1.1 : scale;
 
   return (
     <group position={position}>
-      {/* Main clickable area - hand-tuned per-frame dimensions, scaled by the same
-          groupScale that scales the visual model, so they stay in sync as groupScale is
-          tuned. No rotation applied here (unlike the visual primitive) - matches how this
-          was originally authored/tuned. */}
-      <mesh
+      <primitive
+        object={scene.clone()}
+        scale={[effectiveScale, effectiveScale, effectiveScale]}
+        rotation={[Math.PI / 2, 0, 0]} // Default: flat
         onClick={handleClick}
         onPointerOver={(e) => {
           e.stopPropagation()
@@ -39,21 +40,6 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
           document.body.style.cursor = 'auto'
           setIsHovered(false)
         }}
-        position={[clickableOffsetX, clickableOffsetY, 0.1]}
-      >
-        <boxGeometry args={[clickableWidth, clickableHeight, clickableDepth]} />
-        <meshBasicMaterial
-          transparent
-          opacity={showClickableArea ? 0.3 : 0}
-          color={showClickableArea ? "cyan" : "cyan"}
-        />
-      </mesh>
-
-      {/* The actual frame model */}
-      <primitive
-        object={scene.clone()}
-        scale={[effectiveScale, effectiveScale, effectiveScale]}
-        rotation={[Math.PI / 2, 0, 0]} // Default: flat
       />
     </group>
   )
@@ -62,34 +48,6 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
 const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, stageScale = 1 }) => {
   const [selectedFrame, setSelectedFrame] = useState(null)
   const navigate = useNavigate();
-
-  const showClickableArea = true; // TEMP debug - re-checking alignment now that the 15x-canvas bug is fixed
-
-  // Hand-tuned clickable hitbox dimensions per frame (each model's actual rendered size
-  // differs, so these were tuned by eye to match each frame's visible border). Scaled
-  // directly by groupScale - the same factor that scales the visual model - so they
-  // shrink/grow together as groupScale is tuned.
-  const frame1Controls = { f1_x: 0.0, f1_y: 0.0, f1_width: 1.7, f1_height: 1.1, f1_depth: 0.2, f1_scale: 1.0 }
-  const frame2Controls = { f2_x: 0.0, f2_y: 0.0, f2_width: 2.1, f2_height: 1.4, f2_depth: 0.2, f2_scale: 1.0 }
-  const frame3Controls = { f3_x: 0.0, f3_y: 0.0, f3_width: 1.7, f3_height: 1.1, f3_depth: 0.1, f3_scale: 1.0 }
-  const frame4Controls = { f4_x: 0.1, f4_y: 0.1, f4_width: 2.4, f4_height: 1.5, f4_depth: 0.2, f4_scale: 1.0 }
-  const frame5Controls = { f5_x: 0.0, f5_y: 0.0, f5_width: 1.9, f5_height: 1.2, f5_depth: 0.2, f5_scale: 1.0 }
-  const frame6Controls = { f6_x: 0.0, f6_y: 0.0, f6_width: 1.7, f6_height: 1.1, f6_depth: 0.2, f6_scale: 1.0 }
-  const frame7Controls = { f7_x: 0.0, f7_y: 0.0, f7_width: 1.4, f7_height: 1.7, f7_depth: 0.2, f7_scale: 1.0 }
-  const frame8Controls = { f8_x: 0.0, f8_y: 0.0, f8_width: 1.8, f8_height: 0.9, f8_depth: 0.2, f8_scale: 1.0 }
-  const frame9Controls = { f9_x: 0.0, f9_y: 0.0, f9_width: 1.8, f9_height: 0.9, f9_depth: 0.2, f9_scale: 1.0 }
-  const frame10Controls = { f10_x: 0.0, f10_y: 0.0, f10_width: 1.7, f10_height: 2.5, f10_depth: 0.2, f10_scale: 1.0 }
-  const frame11Controls = { f11_x: 0.0, f11_y: 0.0, f11_width: 1.4, f11_height: 2.0, f11_depth: 0.2, f11_scale: 1.0 }
-  const frame12Controls = { f12_x: 0.0, f12_y: 0.0, f12_width: 1.1, f12_height: 1.5, f12_depth: 0.2, f12_scale: 1.0 }
-  const frame13Controls = { f13_x: 0.0, f13_y: 0.1, f13_width: 0.9, f13_height: 1.2, f13_depth: 0.2, f13_scale: 1.0 }
-  const frame14Controls = { f14_x: -0.1, f14_y: 0.0, f14_width: 1.8, f14_height: 0.7, f14_depth: 0.2, f14_scale: 1.0 }
-  const frame15Controls = { f15_x: 0.0, f15_y: 0.0, f15_width: 2.4, f15_height: 1.1, f15_depth: 0.2, f15_scale: 1.0 }
-
-  const getFrameControls = (frameId) => ({
-    1: frame1Controls, 2: frame2Controls, 3: frame3Controls, 4: frame4Controls, 5: frame5Controls,
-    6: frame6Controls, 7: frame7Controls, 8: frame8Controls, 9: frame9Controls, 10: frame10Controls,
-    11: frame11Controls, 12: frame12Controls, 13: frame13Controls, 14: frame14Controls, 15: frame15Controls,
-  }[frameId])
 
   // Absolute values for 15 frames (with global scale applied)
   const globalScale = 0.52;
@@ -115,7 +73,6 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
   const cameraDistance = 20.0;
 
   const handleFrameClick = (frameId) => {
-    console.log(`Opening lightbox for frame ${frameId}`); // Debug log
     setSelectedFrame(frameId)
   }
 
@@ -136,11 +93,6 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
             near: 0.1,
             far: 1000,
             orthographic: true,
-            // Confirmed (again, even with the 15x-canvas bug fixed) that scaling zoom by
-            // stageScale makes cross-scale hit-testing consistency WORSE, not better:
-            // measured hover-hit spread in design-space units was 72px wide at scale=1 vs
-            // 572px wide at scale=0.66 with this "fix" applied - so the theory behind it is
-            // wrong. Back to the fixed value.
             zoom: 4
           }}
           // r3f measures this element's size (via a ResizeObserver-based hook) to set up
@@ -164,43 +116,20 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
           <ambientLight intensity={0.6} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           <pointLight position={[-10, -10, -5]} intensity={0.3} />
-          
+
           <Suspense fallback={null}>
             {/* Group scaling: scale all positions and models together, keeping spacing consistent */}
-            {framePositions.map((frame) => {
-              const controls = getFrameControls(frame.id)
-              const widthKey = `f${frame.id}_width`
-              const heightKey = `f${frame.id}_height`
-              const depthKey = `f${frame.id}_depth`
-              const scaleKey = `f${frame.id}_scale`
-              const xKey = `f${frame.id}_x`
-              const yKey = `f${frame.id}_y`
-
-              const clickableWidth = controls[widthKey] * controls[scaleKey] * groupScale
-              // The hitbox's true center consistently sits to the left of the visible
-              // picture (confirmed directly: clicking on the empty wall to the left of a
-              // frame still opens that same frame). Shifting right by half the box's own
-              // width moves what was its left edge to become its new center.
-              const clickableOffsetX = controls[xKey] * groupScale + clickableWidth / 2
-
-              return (
-                <Frame
-                  key={frame.id}
-                  id={frame.id}
-                  position={[frame.x * groupScale + globalX, frame.y * groupScale + globalY, frame.z]}
-                  scale={frame.scale * groupScale}
-                  onClick={handleFrameClick}
-                  clickableWidth={clickableWidth}
-                  clickableHeight={controls[heightKey] * controls[scaleKey] * groupScale}
-                  clickableDepth={controls[depthKey] * controls[scaleKey] * groupScale}
-                  clickableOffsetX={clickableOffsetX}
-                  clickableOffsetY={controls[yKey] * groupScale}
-                  showClickableArea={showClickableArea}
-                />
-              )
-            })}
+            {framePositions.map((frame) => (
+              <Frame
+                key={frame.id}
+                id={frame.id}
+                position={[frame.x * groupScale + globalX, frame.y * groupScale + globalY, frame.z]}
+                scale={frame.scale * groupScale}
+                onClick={handleFrameClick}
+              />
+            ))}
           </Suspense>
-          
+
           {/* Orbit controls removed - camera is now locked */}
         </Canvas>
       </div>

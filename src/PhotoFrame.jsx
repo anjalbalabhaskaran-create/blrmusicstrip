@@ -136,11 +136,11 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
             near: 0.1,
             far: 1000,
             orthographic: true,
-            // NOTE: tried making this scale-aware (zoom: 4 * stageScale) to compensate for
-            // a suspected canvas-sizing mismatch at non-1:1 stage scale. Real-browser
-            // testing showed that made things worse (new visual shift, still unresponsive
-            // in both Safari and Firefox), so reverted to the original fixed value pending
-            // real diagnostic data instead of further guessing.
+            // Confirmed (again, even with the 15x-canvas bug fixed) that scaling zoom by
+            // stageScale makes cross-scale hit-testing consistency WORSE, not better:
+            // measured hover-hit spread in design-space units was 72px wide at scale=1 vs
+            // 572px wide at scale=0.66 with this "fix" applied - so the theory behind it is
+            // wrong. Back to the fixed value.
             zoom: 4
           }}
           // r3f measures this element's size (via a ResizeObserver-based hook) to set up

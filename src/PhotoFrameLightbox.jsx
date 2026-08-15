@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getAssetPath } from './utils/assetPath';
 
 const PhotoFrameLightbox = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const PhotoFrameLightbox = () => {
       }}
     >
       <img
-        src={"/background image/loader background.png"}
+        src={getAssetPath("/background image/loader background.png")}
         alt="Background"
         style={{
           position: 'fixed',

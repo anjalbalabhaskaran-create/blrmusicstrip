@@ -3,10 +3,11 @@ import { OrbitControls, useGLTF } from '@react-three/drei'
 import { Suspense, useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { getAssetPath } from './utils/assetPath'
 
 // Auto-rotating frame component
 function RotatingFrame({ frameId }) {
-  const { scene } = useGLTF(`/models/p${frameId}.glb`)
+  const { scene } = useGLTF(getAssetPath(`/models/p${frameId}.glb`))
   const meshRef = useRef()
   const [calculatedScale, setCalculatedScale] = useState(1.0)
 

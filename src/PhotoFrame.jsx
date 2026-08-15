@@ -1,20 +1,19 @@
 import { Canvas, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { useState, Suspense, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { photoFrameData } from './photoFrameData'
 import Lightbox3D from './Lightbox3D'
 import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom';
+import { getAssetPath } from './utils/assetPath'
 
 // Individual Frame Component with clickable box
 function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, clickableDepth, clickableOffsetX, clickableOffsetY, showClickableArea }) {
-  const { scene } = useGLTF(`/models/p${id}.glb`)
+  const { scene } = useGLTF(getAssetPath(`/models/p${id}.glb`))
   const [isHovered, setIsHovered] = useState(false)
-  
-  console.log(`Rendering frame ${id} at position:`, position, `scale:`, scale); // Debug log
-  
+
   const handleClick = (e) => {
-    console.log(`Photo frame ${id} clicked!`); // Debug log
     e.stopPropagation();
     onClick(id);
   };
@@ -24,35 +23,35 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
 
   return (
     <group position={position}>
-      {/* Main clickable area - properly dimensioned for each frame with X/Y offset */}
+      {/* Main clickable area - hand-tuned per-frame dimensions (each model's raw GLTF
+          geometry differs in size due to per-file node transforms, so a size derived
+          purely from the geometry's bounding box doesn't track the visible frame
+          consistently - these fixed, hand-tuned numbers do). */}
       <mesh
         onClick={handleClick}
         onPointerOver={(e) => {
           e.stopPropagation()
           document.body.style.cursor = 'pointer'
           setIsHovered(true)
-          console.log(`Frame ${id} hovered - scaling up to 1.2x`);
-          console.log(`Hovering over frame ${id}, dimensions: ${clickableWidth.toFixed(2)} x ${clickableHeight.toFixed(2)}, offset: ${clickableOffsetX.toFixed(2)}, ${clickableOffsetY.toFixed(2)}`);
         }}
         onPointerOut={(e) => {
           e.stopPropagation()
           document.body.style.cursor = 'auto'
           setIsHovered(false)
-          console.log(`Frame ${id} unhovered - scaling back to 1x`);
         }}
-        position={[clickableOffsetX, clickableOffsetY, 0.1]} // Apply X/Y offset and slightly in front of frame
+        position={[clickableOffsetX, clickableOffsetY, 0.1]}
       >
         <boxGeometry args={[clickableWidth, clickableHeight, clickableDepth]} />
-        <meshBasicMaterial 
-          transparent 
-          opacity={showClickableArea ? 0.3 : 0} 
-          color={showClickableArea ? "cyan" : "cyan"} 
+        <meshBasicMaterial
+          transparent
+          opacity={showClickableArea ? 0.3 : 0}
+          color={showClickableArea ? "cyan" : "cyan"}
         />
       </mesh>
-      
+
       {/* The actual frame model */}
-      <primitive 
-        object={scene.clone()} 
+      <primitive
+        object={scene.clone()}
         scale={[effectiveScale, effectiveScale, effectiveScale]}
         rotation={[Math.PI / 2, 0, 0]} // Default: flat
       />
@@ -63,172 +62,38 @@ function Frame({ id, position, scale, onClick, clickableWidth, clickableHeight, 
 const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) => {
   const [selectedFrame, setSelectedFrame] = useState(null)
   const navigate = useNavigate();
-  
-  // Fixed: Hide clickable areas (no more Leva control)
+
+  // The hand-tuned clickable dimensions below were calibrated against this component's
+  // original default groupScale (0.74). Scale them by the ratio to the CURRENT groupScale
+  // so hitboxes shrink/grow in step with however far the visuals have been tuned since.
+  const groupScaleRatio = groupScale / 0.74;
+
   const showClickableArea = false;
-  
-  // Fixed controls for frames 1, 2, and 3 (removed from Leva) - using current Leva values
-  const frame1Controls = {
-    f1_x: 0.0,
-    f1_y: 0.0,
-    f1_width: 1.7,
-    f1_height: 1.1,
-    f1_depth: 0.2,
-    f1_scale: 1.0,
-  }
-  
-  const frame2Controls = {
-    f2_x: 0.0,
-    f2_y: 0.0,
-    f2_width: 2.1,
-    f2_height: 1.4,
-    f2_depth: 0.2,
-    f2_scale: 1.0,
-  }
-  
-  const frame3Controls = {
-    f3_x: 0.0,
-    f3_y: 0.0,
-    f3_width: 1.7,
-    f3_height: 1.1,
-    f3_depth: 0.1,
-    f3_scale: 1.0,
-  }
-  
-  // Remaining Leva controls for frames 4-15
-  const frame4Controls = {
-    f4_x: 0.1,
-    f4_y: 0.1,
-    f4_width: 2.4,
-    f4_height: 1.5,
-    f4_depth: 0.2,
-    f4_scale: 1.0,
-  }
-  
-  const frame5Controls = {
-    f5_x: 0.0,
-    f5_y: 0.0,
-    f5_width: 1.9,
-    f5_height: 1.2,
-    f5_depth: 0.2,
-    f5_scale: 1.0,
-  }
-  
-  const frame6Controls = {
-    f6_x: 0.0,
-    f6_y: 0.0,
-    f6_width: 1.7,
-    f6_height: 1.1,
-    f6_depth: 0.2,
-    f6_scale: 1.0,
-  }
-  
-  // Remaining Leva controls for frames 7-15
-  const frame7Controls = {
-    f7_x: 0.0,
-    f7_y: 0.0,
-    f7_width: 1.4,
-    f7_height: 1.7,
-    f7_depth: 0.2,
-    f7_scale: 1.0,
-  }
-  
-  const frame8Controls = {
-    f8_x: 0.0,
-    f8_y: 0.0,
-    f8_width: 1.8,
-    f8_height: 0.9,
-    f8_depth: 0.2,
-    f8_scale: 1.0,
-  }
-  
-  const frame9Controls = {
-    f9_x: 0.0,
-    f9_y: 0.0,
-    f9_width: 1.8,
-    f9_height: 0.9,
-    f9_depth: 0.2,
-    f9_scale: 1.0,
-  }
-  
-  // Remaining Leva controls for frames 10-15
-  const frame10Controls = {
-    f10_x: 0.0,
-    f10_y: 0.0,
-    f10_width: 1.7,
-    f10_height: 2.5,
-    f10_depth: 0.2,
-    f10_scale: 1.0,
-  }
-  
-  const frame11Controls = {
-    f11_x: 0.0,
-    f11_y: 0.0,
-    f11_width: 1.4,
-    f11_height: 2.0,
-    f11_depth: 0.2,
-    f11_scale: 1.0,
-  }
-  
-  const frame12Controls = {
-    f12_x: 0.0,
-    f12_y: 0.0,
-    f12_width: 1.1,
-    f12_height: 1.5,
-    f12_depth: 0.2,
-    f12_scale: 1.0,
-  }
-  
-  // All frames now use fixed controls (no more Leva)
-  const frame13Controls = {
-    f13_x: 0.0,
-    f13_y: 0.1,
-    f13_width: 0.9,
-    f13_height: 1.2,
-    f13_depth: 0.2,
-    f13_scale: 1.0,
-  }
-  
-  const frame14Controls = {
-    f14_x: -0.1,
-    f14_y: 0.0,
-    f14_width: 1.8,
-    f14_height: 0.7,
-    f14_depth: 0.2,
-    f14_scale: 1.0,
-  }
-  
-  const frame15Controls = {
-    f15_x: 0.0,
-    f15_y: 0.0,
-    f15_width: 2.4,
-    f15_height: 1.1,
-    f15_depth: 0.2,
-    f15_scale: 1.0,
-  }
-  
-  // Function to get frame-specific controls
-  const getFrameControls = (frameId) => {
-    const controlsMap = {
-      1: frame1Controls,
-      2: frame2Controls,
-      3: frame3Controls,
-      4: frame4Controls,
-      5: frame5Controls,
-      6: frame6Controls,
-      7: frame7Controls,
-      8: frame8Controls,
-      9: frame9Controls,
-      10: frame10Controls,
-      11: frame11Controls,
-      12: frame12Controls,
-      13: frame13Controls,
-      14: frame14Controls,
-      15: frame15Controls,
-    }
-    return controlsMap[frameId]
-  }
-  
+
+  // Hand-tuned clickable hitbox dimensions per frame (each model's actual rendered size
+  // differs, so these were tuned by eye to match each frame's visible border).
+  const frame1Controls = { f1_x: 0.0, f1_y: 0.0, f1_width: 1.7, f1_height: 1.1, f1_depth: 0.2, f1_scale: 1.0 }
+  const frame2Controls = { f2_x: 0.0, f2_y: 0.0, f2_width: 2.1, f2_height: 1.4, f2_depth: 0.2, f2_scale: 1.0 }
+  const frame3Controls = { f3_x: 0.0, f3_y: 0.0, f3_width: 1.7, f3_height: 1.1, f3_depth: 0.1, f3_scale: 1.0 }
+  const frame4Controls = { f4_x: 0.1, f4_y: 0.1, f4_width: 2.4, f4_height: 1.5, f4_depth: 0.2, f4_scale: 1.0 }
+  const frame5Controls = { f5_x: 0.0, f5_y: 0.0, f5_width: 1.9, f5_height: 1.2, f5_depth: 0.2, f5_scale: 1.0 }
+  const frame6Controls = { f6_x: 0.0, f6_y: 0.0, f6_width: 1.7, f6_height: 1.1, f6_depth: 0.2, f6_scale: 1.0 }
+  const frame7Controls = { f7_x: 0.0, f7_y: 0.0, f7_width: 1.4, f7_height: 1.7, f7_depth: 0.2, f7_scale: 1.0 }
+  const frame8Controls = { f8_x: 0.0, f8_y: 0.0, f8_width: 1.8, f8_height: 0.9, f8_depth: 0.2, f8_scale: 1.0 }
+  const frame9Controls = { f9_x: 0.0, f9_y: 0.0, f9_width: 1.8, f9_height: 0.9, f9_depth: 0.2, f9_scale: 1.0 }
+  const frame10Controls = { f10_x: 0.0, f10_y: 0.0, f10_width: 1.7, f10_height: 2.5, f10_depth: 0.2, f10_scale: 1.0 }
+  const frame11Controls = { f11_x: 0.0, f11_y: 0.0, f11_width: 1.4, f11_height: 2.0, f11_depth: 0.2, f11_scale: 1.0 }
+  const frame12Controls = { f12_x: 0.0, f12_y: 0.0, f12_width: 1.1, f12_height: 1.5, f12_depth: 0.2, f12_scale: 1.0 }
+  const frame13Controls = { f13_x: 0.0, f13_y: 0.1, f13_width: 0.9, f13_height: 1.2, f13_depth: 0.2, f13_scale: 1.0 }
+  const frame14Controls = { f14_x: -0.1, f14_y: 0.0, f14_width: 1.8, f14_height: 0.7, f14_depth: 0.2, f14_scale: 1.0 }
+  const frame15Controls = { f15_x: 0.0, f15_y: 0.0, f15_width: 2.4, f15_height: 1.1, f15_depth: 0.2, f15_scale: 1.0 }
+
+  const getFrameControls = (frameId) => ({
+    1: frame1Controls, 2: frame2Controls, 3: frame3Controls, 4: frame4Controls, 5: frame5Controls,
+    6: frame6Controls, 7: frame7Controls, 8: frame8Controls, 9: frame9Controls, 10: frame10Controls,
+    11: frame11Controls, 12: frame12Controls, 13: frame13Controls, 14: frame14Controls, 15: frame15Controls,
+  }[frameId])
+
   // Absolute values for 15 frames (with global scale applied)
   const globalScale = 0.52;
   const framePositions = [
@@ -299,7 +164,7 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) =
               const scaleKey = `f${frame.id}_scale`
               const xKey = `f${frame.id}_x`
               const yKey = `f${frame.id}_y`
-              
+
               return (
                 <Frame
                   key={frame.id}
@@ -307,11 +172,11 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) =
                   position={[frame.x * groupScale + globalX, frame.y * groupScale + globalY, frame.z]}
                   scale={frame.scale * groupScale}
                   onClick={handleFrameClick}
-                  clickableWidth={controls[widthKey] * controls[scaleKey]}
-                  clickableHeight={controls[heightKey] * controls[scaleKey]}
-                  clickableDepth={controls[depthKey] * controls[scaleKey]}
-                  clickableOffsetX={controls[xKey]}
-                  clickableOffsetY={controls[yKey]}
+                  clickableWidth={controls[widthKey] * controls[scaleKey] * groupScaleRatio}
+                  clickableHeight={controls[heightKey] * controls[scaleKey] * groupScaleRatio}
+                  clickableDepth={controls[depthKey] * controls[scaleKey] * groupScaleRatio}
+                  clickableOffsetX={controls[xKey] * groupScaleRatio}
+                  clickableOffsetY={controls[yKey] * groupScaleRatio}
                   showClickableArea={showClickableArea}
                 />
               )
@@ -322,14 +187,18 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) =
         </Canvas>
       </div>
 
-      {/* Lightbox */}
-      {selectedFrame && (
-        <Lightbox3D 
+      {/* Lightbox - portaled to document.body so its `position:fixed` overlay is
+          contained by the real viewport, not by the stage's scaled/transformed ancestor
+          (a transform on an ancestor makes fixed-position descendants size/position
+          relative to that ancestor's box instead of the viewport). */}
+      {selectedFrame && createPortal(
+        <Lightbox3D
           frameId={selectedFrame}
           frameData={photoFrameData[selectedFrame]}
           onClose={closeLightbox}
           onNavigate={navigateFrame}
-        />
+        />,
+        document.body
       )}
     </>
   )
@@ -337,7 +206,7 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74 }) =
 
 // Preload all GLB files
 for (let i = 1; i <= 15; i++) {
-  useGLTF.preload(`/models/p${i}.glb`)
+  useGLTF.preload(getAssetPath(`/models/p${i}.glb`))
 }
 
 export default PhotoFrameContainer

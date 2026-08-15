@@ -11,6 +11,7 @@ import MusicStripModel from './MusicStripModel';
 import musicStripState from './Music Strip Animation.theatre-project-state.json';
 import Lightbox from './Lightbox';
 import TextOverlay from './TextOverlay';
+import { getAssetPath } from './utils/assetPath';
 
 const musicStripProject = getProject('Music Strip Animation', {
   state: musicStripState,
@@ -630,7 +631,7 @@ const MusicStrip = () => {
         <div className="loader-content" style={{textAlign: 'center', width: '85vw', maxWidth: 1200, position: 'relative', height: 120}}>
           <img 
             ref={loaderGifRef}
-            src="/video/walkingmusicians.gif" 
+            src={getAssetPath('/video/walkingmusicians.gif')}
             alt="Walking Musicians" 
             className="loader-musicians" 
             style={{
@@ -660,19 +661,19 @@ const MusicStrip = () => {
         {/* Background Music */}
         <audio 
           ref={audioRef}
-          src="/music/bg.m4a"
+          src={getAssetPath('/music/bg.m4a')}
           preload="auto"
           style={{ display: 'none' }}
         />
         
         {/* Background Sounds */}
-        <audio ref={firstAudioRef} src="/sounds/first.mp3" loop preload="auto" style={{ display: 'none' }} />
-        <audio ref={secondAudioRef} src="/sounds/2nd.mp3" loop preload="auto" style={{ display: 'none' }} />
-        <audio ref={hippieAudioRef} src="/sounds/Hippie.mp3" loop preload="auto" style={{ display: 'none' }} />
-        <audio ref={cubbonAudioRef} src="/sounds/cubbon.mp3" loop preload="auto" style={{ display: 'none' }} />
-        <audio ref={streetAudioRef} src="/sounds/street.mp3" loop preload="auto" style={{ display: 'none' }} />
-        <audio ref={metroAudioRef} src="/sounds/metro.mp3" loop preload="auto" style={{ display: 'none' }} />
-        <audio ref={churchStreetAudioRef} src="/sounds/church street.mp3" loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={firstAudioRef} src={getAssetPath('/sounds/first.mp3')} loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={secondAudioRef} src={getAssetPath('/sounds/2nd.mp3')} loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={hippieAudioRef} src={getAssetPath('/sounds/Hippie.mp3')} loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={cubbonAudioRef} src={getAssetPath('/sounds/cubbon.mp3')} loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={streetAudioRef} src={getAssetPath('/sounds/street.mp3')} loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={metroAudioRef} src={getAssetPath('/sounds/metro.mp3')} loop preload="auto" style={{ display: 'none' }} />
+        <audio ref={churchStreetAudioRef} src={getAssetPath('/sounds/church street.mp3')} loop preload="auto" style={{ display: 'none' }} />
         <Canvas shadows onClick={handleUserInteraction} style={{ width: '100vw', height: '100vh', display: 'block', background: 'white' }}>
           <ScrollControls pages={5} damping={0.01}> {/* much lower damping for very slow scroll */}
             <SheetProvider sheet={animationSheet}>

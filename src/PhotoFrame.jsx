@@ -128,6 +128,35 @@ const PhotoFrameContainer = ({ globalX = 1, globalY = -1, groupScale = 0.74, sta
             height: 982,
             zIndex: 2
           }}
+          onCreated={(state) => {
+            // Fix pointer/raycast coordinates under the stage's CSS `transform: scale()`.
+            //
+            // r3f's default `compute` does `event.offsetX / state.size.width`, but those two
+            // are measured in DIFFERENT coordinate spaces:
+            //   - offsetX is relative to this canvas's own, UNtransformed box, so it runs
+            //     0..1512 no matter how the stage is scaled.
+            //   - state.size comes from react-use-measure -> getBoundingClientRect(), which
+            //     DOES apply the ancestor transform, so it's the visual width (e.g. 700).
+            // Dividing a 0..1512 value by 700 yields a pointer range of -1..+3.3 instead of
+            // -1..+1, so raycasts land far from the visible frames. The two only agree when
+            // the stage happens to render 1:1 (a 1512x982 viewport), which is why this looked
+            // fine at the design size and drifted further the further off it you got - in
+            // every browser.
+            //
+            // Deriving the pointer from clientX/clientY minus the canvas's own bounding rect
+            // keeps numerator and denominator in the same (visual/viewport) space, so it's
+            // correct at any stage scale and doesn't depend on offsetX's transform behaviour.
+            state.setEvents({
+              compute: (event, rootState) => {
+                const rect = rootState.gl.domElement.getBoundingClientRect()
+                rootState.pointer.set(
+                  ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                  -((event.clientY - rect.top) / rect.height) * 2 + 1
+                )
+                rootState.raycaster.setFromCamera(rootState.pointer, rootState.camera)
+              },
+            })
+          }}
         >
           <ambientLight intensity={0.6} />
           <directionalLight position={[10, 10, 5]} intensity={1} />

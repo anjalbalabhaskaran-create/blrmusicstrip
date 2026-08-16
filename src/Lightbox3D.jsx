@@ -128,7 +128,7 @@ const Lightbox3D = ({ frameId, frameData, onClose, onNavigate }) => {
   const isSpecial = frameId === 1 || frameId === 4 || frameId === 5 || frameId === 9 || frameId === 10
 
   return (
-    <div className="lightbox-overlay" onClick={handleBackdropClick} onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className="pf-lightbox-overlay" onClick={handleBackdropClick} onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Left Navigation Arrow - Outside lightbox */}
       <button
         onClick={handlePrevious}
@@ -195,13 +195,16 @@ const Lightbox3D = ({ frameId, frameData, onClose, onNavigate }) => {
         →
       </button>
 
-      <div className="lightbox-container" onClick={handleContentClick}>
-        <div className="lightbox-content" style={isSpecial ? { flexDirection: 'column', height: '100%' } : undefined}>
+      <div className="pf-lightbox-container" onClick={handleContentClick}>
+        <div className="pf-lightbox-content" style={isSpecial ? { flexDirection: 'column', height: '100%' } : undefined}>
           {/* 3D viewer + title - same DOM position/type regardless of layout, so the
               Canvas (and its WebGL context) is never unmounted when frameId changes
-              between special and regular frames. */}
-          <div className={isSpecial ? undefined : 'lightbox-left'}>
-            <div className="lightbox-3d" style={isSpecial ? { flex: '9', width: '100%', height: '90%' } : undefined}>
+              between special and regular frames. Always flex:1 (via pf-lightbox-left)
+              so it fills the container in both layouts - special frames used to get no
+              className here at all, leaving them unsized and creating a gap next to the
+              3D viewer. */}
+          <div className="pf-lightbox-left">
+            <div className="pf-lightbox-3d" style={isSpecial ? { flex: '9', width: '100%', height: '90%' } : undefined}>
               <Canvas
                 camera={{ position: [0, 0, 30], fov: 40 }}
                 style={{ width: '100%', height: '100%' }}
@@ -225,37 +228,37 @@ const Lightbox3D = ({ frameId, frameData, onClose, onNavigate }) => {
                 />
               </Canvas>
             </div>
-            <h2 className="lightbox-title">{frameData.title}</h2>
+            <h2 className="pf-lightbox-title">{frameData.title}</h2>
           </div>
 
           {/* Right Side: Description and Quote - only for the regular layout */}
           {!isSpecial && (
-            <div className="lightbox-right" onClick={(e) => e.stopPropagation()}>
+            <div className="pf-lightbox-right" onClick={(e) => e.stopPropagation()}>
               {frameData.isDualContent ? (
                 // Dual content layout for frames 11 and 12
-                <div className="dual-content-container">
-                  <div className="content-section">
-                    <p className="lightbox-description">{frameData.description1}</p>
-                    <p className="lightbox-description lightbox-quote">- {frameData.quote1}</p>
+                <div className="pf-dual-content-container">
+                  <div className="pf-content-section">
+                    <p className="pf-lightbox-description">{frameData.description1}</p>
+                    <p className="pf-lightbox-description pf-lightbox-quote">- {frameData.quote1}</p>
                   </div>
 
-                  <div className="content-divider"></div>
+                  <div className="pf-content-divider"></div>
 
-                  <div className="content-section">
-                    <p className="lightbox-description">{frameData.description2}</p>
-                    <p className="lightbox-description lightbox-quote">- {frameData.quote2}</p>
+                  <div className="pf-content-section">
+                    <p className="pf-lightbox-description">{frameData.description2}</p>
+                    <p className="pf-lightbox-description pf-lightbox-quote">- {frameData.quote2}</p>
                   </div>
                 </div>
               ) : (
                 // Standard content layout for other frames
                 <>
-                  <p className="lightbox-description">{frameData.description}</p>
-                  <p className="lightbox-description lightbox-quote">{frameData.quote}</p>
+                  <p className="pf-lightbox-description">{frameData.description}</p>
+                  <p className="pf-lightbox-description pf-lightbox-quote">{frameData.quote}</p>
                 </>
               )}
 
-              <div className="lightbox-meta">
-                <span className="frame-id">Frame #{frameId}</span>
+              <div className="pf-lightbox-meta">
+                <span className="pf-frame-id">Frame #{frameId}</span>
               </div>
             </div>
           )}

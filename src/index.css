@@ -266,8 +266,11 @@
   pointer-events: auto;
 }
 
-/* Lightbox Styles */
-.lightbox-overlay {
+/* Lightbox Styles (photo-frame lightbox - kept under a pf- prefix so it can never
+   collide with Lightbox.css's identically-named classes for the unrelated MusicStrip
+   credits lightbox; a same-name collision there is what silently broke an earlier
+   background-opacity fix). */
+.pf-lightbox-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -278,22 +281,24 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
 }
 
-.lightbox-container {
+.pf-lightbox-container {
   background: transparent;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  width: 90vw;
-  height: 80vh;
-  max-width: 1200px;
-  max-height: 700px;
+  width: 72vw;
+  height: 64vh;
+  max-width: 960px;
+  max-height: 560px;
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideIn 0.3s ease-out;
 }
 
-.lightbox-close {
+.pf-lightbox-close {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -315,59 +320,59 @@
   font-family: Arial, sans-serif;
 }
 
-.lightbox-close:hover {
+.pf-lightbox-close:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.lightbox-content {
+.pf-lightbox-content {
   display: flex;
   height: 100%;
 }
 
-.lightbox-left {
+.pf-lightbox-left {
   flex: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.lightbox-3d {
+.pf-lightbox-3d {
   flex: 1;
   background: radial-gradient(circle at center, #2a2a2a 0%, #1a1a1a 100%);
 }
 
-.lightbox-right {
-  flex: 0 0 500px;
-  padding: 40px;
+.pf-lightbox-right {
+  flex: 0 0 400px;
+  padding: 32px;
   color: white;
   overflow-y: auto;
   background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.lightbox-title {
-  font-size: 18px;
+.pf-lightbox-title {
+  font-size: 16px;
   font-weight: 300;
-  margin: 20px 0 0 0;
+  margin: 16px 0 0 0;
   color: #ffffff;
   line-height: 1.2;
-  padding: 20px;
+  padding: 16px;
   text-align: center;
   background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.lightbox-description {
-  font-size: 16px;
+.pf-lightbox-description {
+  font-size: 14px;
   line-height: 1.6;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: #cccccc;
 }
 
-.lightbox-quote {
-  font-size: 16px;
+.pf-lightbox-quote {
+  font-size: 14px;
   line-height: 1.6;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: #cccccc;
   font-style: italic;
   border-left: 3px solid #666666;
@@ -375,20 +380,20 @@
   margin-left: 10px;
 }
 
-.lightbox-body {
-  font-size: 14px;
+.pf-lightbox-body {
+  font-size: 13px;
   line-height: 1.7;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   color: #aaaaaa;
 }
 
-.lightbox-meta {
+.pf-lightbox-meta {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 20px;
+  padding-top: 16px;
   margin-top: auto;
 }
 
-.frame-id {
+.pf-frame-id {
   font-size: 12px;
   color: #666666;
   text-transform: uppercase;
@@ -396,71 +401,71 @@
 }
 
 /* Dual Content Layout for Frames 11 & 12 */
-.dual-content-container {
+.pf-dual-content-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
 }
 
-.content-section {
-  margin-bottom: 25px;
-  padding: 15px 0;
+.pf-content-section {
+  margin-bottom: 20px;
+  padding: 12px 0;
 }
 
-.content-divider {
+.pf-content-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
-  margin: 20px 0;
+  margin: 16px 0;
   width: 100%;
 }
 
-.dual-content-container .lightbox-description {
-  margin-bottom: 15px;
+.pf-dual-content-container .pf-lightbox-description {
+  margin-bottom: 12px;
 }
 
-.dual-content-container .lightbox-quote {
-  margin-bottom: 10px;
+.pf-dual-content-container .pf-lightbox-quote {
+  margin-bottom: 8px;
   font-style: italic;
   color: #cccccc;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .lightbox-container {
+  .pf-lightbox-container {
     width: 95vw;
     height: 90vh;
     flex-direction: column;
   }
-  
-  .lightbox-content {
+
+  .pf-lightbox-content {
     flex-direction: column;
   }
 
-  .lightbox-left {
+  .pf-lightbox-left {
     flex: 1;
     min-height: 300px;
   }
-  
-  .lightbox-3d {
+
+  .pf-lightbox-3d {
     flex: 1;
     min-height: 250px;
   }
 
-  .lightbox-title {
+  .pf-lightbox-title {
     margin: 10px 0 0 0;
     padding: 15px;
     font-size: 20px;
     font-weight: 300;
   }
-  
-  .lightbox-right {
+
+  .pf-lightbox-right {
     flex: none;
     padding: 20px;
     max-height: 300px;
   }
-  
-  .lightbox-close {
+
+  .pf-lightbox-close {
     top: 5px;
     right: 5px;
     width: 32px;

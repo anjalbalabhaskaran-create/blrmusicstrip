@@ -1,13 +1,14 @@
 import * as THREE from "three"
 import { useRef, useMemo } from "react"
 import { useFrame, useLoader, useThree } from "@react-three/fiber"
+import { getAssetPath } from "./utils/assetPath"
 // import { useControls } from "leva"
 
 export default function CloudLayer() {
   const groupRef = useRef()
   const { camera } = useThree()
 
-  const texture = useLoader(THREE.TextureLoader, "/cloud.png")
+  const texture = useLoader(THREE.TextureLoader, getAssetPath("/cloud.png"))
 
   // Final values from Leva UI (hardcoded)
   const count = 35

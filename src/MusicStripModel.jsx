@@ -4,6 +4,7 @@ import { useEffect, forwardRef, useImperativeHandle, useRef, useCallback } from 
 import gsap from 'gsap';
 // import TreeWorld from './TreeWorld';
 import CloudsLayer from './Clouds';
+import { getAssetPath } from './utils/assetPath';
 
 const TARGET_MESHES = ['S1', 'S2', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8']; // meshes you want to fade
 const VIDEO_MESHES = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'];
@@ -311,4 +312,4 @@ const MusicStripModel = forwardRef(({ onVideoTrigger }, ref) => {
 });
 
 export default MusicStripModel;
-useGLTF.preload('/models/ms4.glb');
+useGLTF.preload(getAssetPath('/models/ms4.glb'));

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAssetPath } from './utils/assetPath';
 
 const BeginningLoading = ({ onComplete }) => {
   const navigate = useNavigate();
@@ -88,8 +89,8 @@ const BeginningLoading = ({ onComplete }) => {
           transition: 'left 0.1s ease-out',
           zIndex: 10,
         }}>
-          <img 
-            src="/video/walkingmusicians.gif" 
+          <img
+            src={getAssetPath('/video/walkingmusicians.gif')}
             alt="Walking Musicians"
             style={{
               width: '96px', // Increased by 1.2x (80px * 1.2 = 96px)

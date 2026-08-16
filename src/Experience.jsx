@@ -4,9 +4,32 @@ import PhotoFrame from './PhotoFrame'
 import { Html } from '@react-three/drei'
 import React from 'react'
 import { useGlobalAudio } from './GlobalAudioContext.jsx'
+import { getAssetPath } from './utils/assetPath'
+
+// Design stage: the scene was designed against a 14" MacBook Pro viewport (1512x982).
+// Every layer/button below is positioned in absolute pixels tuned to that resolution,
+// so the whole scene is scaled as one unit to stay in sync on other screen sizes.
+const DESIGN_W = 1512
+const DESIGN_H = 982
+
+function useStageScale(mode) { // mode: 'fit' | 'native'
+  const [scale, setScale] = useState(1)
+  useEffect(() => {
+    const update = () => setScale(
+      mode === 'native'
+        ? 1
+        : Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H)
+    )
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [mode])
+  return scale
+}
 
 const Experience = () => {
   const navigate = useNavigate();
+  const scale = useStageScale('fit')
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [imagesLoaded, setImagesLoaded] = useState(0)
   const [hasError, setHasError] = useState(false)
@@ -24,8 +47,8 @@ const Experience = () => {
   const videoConfig = {
     x: 30, // px offset (from Leva)
     y: -52, // px offset (from Leva)
-    width: 14.0, // vw (from Leva)
-    height: 19.2, // vh (from Leva)
+    width: 212, // px (was 14vw on the 1512px design stage)
+    height: 189, // px (was 19.2vh on the 982px design stage)
     scale: 1.13, // scale factor (from Leva)
     volume: 1.00, // audio volume (from Leva)
     objectFit: 'cover',
@@ -35,16 +58,15 @@ const Experience = () => {
   const b0Controls = {
     b0Scale: 0.93,
     b0X: -423,
-    b0Y: -314,
-    b0ParallaxX: 50.0,
-    b0ParallaxY: 50.0,
+    b0Y: -374,
+    b0ParallaxX: 25.0,
+    b0ParallaxY: 25.0,
     b0Opacity: 1.00,
   };
 
-  // Fixed values for Text Layer (restored for visibility)
+  // Fixed values for Text Layer (centered on the stage; see layer-text style for the
+  // top:50%/left:50%/margin offset that replaces the old top-left translate)
   const textControls = {
-    textX: 73,
-    textY: 16,
     textScale: 0.68,
     textParallaxX: 11.0,
     textParallaxY: 11.2,
@@ -85,10 +107,16 @@ const Experience = () => {
     b3Opacity: 1.0,
   }
 
-  // Responsive values for PhotoFrame and video
-  const groupScale = 0.33;
-  const globalX = 0.69;
-  const globalY = 0.32;
+  // Responsive values for PhotoFrame group
+  const groupScale = 0.33 * 0.9;
+  const globalX = 0.69 - 1.25 + 0.75 + 0.25;
+  const globalY = 0.32 + 0.5;
+
+  // Hover text position, centered on the B1 window illustration. (Note: the box used to
+  // inherit height:100% from the shared .parallax-layer class, throwing off its scale/margin
+  // math - fixed below with height:'auto' on the layer-text div.)
+  const textMarginLeft = -756;
+  const textMarginTop = -281;
 
   // Original MusicStrip Button values from Leva panel
   const musicBtnStyle = {
@@ -152,7 +180,7 @@ const Experience = () => {
 
   const handleImageError = (imageName) => {
     console.error(`Failed to load image: ${imageName}`)
-    console.error(`Full path attempted: parallax/${imageName}`)
+    console.error(`Full path attempted: /parallax/${imageName}`)
     setHasError(true)
   }
 
@@ -200,20 +228,33 @@ const Experience = () => {
   };
 
   return (
-    <div 
-      className="experience-container"
-      style={{
-        transform: isZoomed 
-          ? `translate(${-zoomControls.zoomCenterX}px, ${-zoomControls.zoomCenterY}px) scale(${zoomControls.zoomScale})`
-          : 'translate(0px, 0px) scale(1)',
-        transition: isZoomed 
-          ? `transform ${zoomControls.transitionDuration}ms ease-in-out`
-          : `transform ${zoomControls.transitionDuration}ms ease-out`,
-        transformOrigin: 'center center',
-        background: '#1a1a1a', // Consistent background color
-      }}
-      onClick={handleContainerClick}
-    >
+    <div style={{ width: '100vw', height: '100vh', display: 'flex', overflow: 'hidden', background: '#1a1a1a' }}>
+      <div style={{ margin: 'auto', flex: 'none', width: DESIGN_W * scale, height: DESIGN_H * scale }}>
+        <div
+          className="experience-container"
+          style={{
+            width: DESIGN_W,
+            height: DESIGN_H,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            background: '#1a1a1a',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              transform: isZoomed
+                ? `translate(${-zoomControls.zoomCenterX}px, ${-zoomControls.zoomCenterY}px) scale(${zoomControls.zoomScale})`
+                : 'translate(0px, 0px) scale(1)',
+              transition: isZoomed
+                ? `transform ${zoomControls.transitionDuration}ms ease-in-out`
+                : `transform ${zoomControls.transitionDuration}ms ease-out`,
+              transformOrigin: 'center center',
+            }}
+            onClick={handleContainerClick}
+          >
       {/* Volume Button - Ultra Minimal UI */}
       <button
         style={{
@@ -314,7 +355,7 @@ const Experience = () => {
         }}
       >
         <img 
-          src="parallax/B0.jpg"
+          src={getAssetPath('/parallax/B0.jpg')}
           alt="B0 Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B0.jpg')}
@@ -322,10 +363,15 @@ const Experience = () => {
       </div>
 
       {/* Text Layer (hover text and creative UI) */}
-      <div 
+      <div
         className="parallax-layer layer-text"
         style={{
-          transform: `translate(${textControls.textX + mousePos.x * textControls.textParallaxX}px, ${textControls.textY + mousePos.y * textControls.textParallaxY}px) scale(${textControls.textScale})`,
+          top: '50%',
+          left: '50%',
+          height: 'auto', // override .parallax-layer's height:100% so the box shrink-wraps
+          marginLeft: `${textMarginLeft}px`,
+          marginTop: `${textMarginTop}px`,
+          transform: `translate(${mousePos.x * textControls.textParallaxX}px, ${mousePos.y * textControls.textParallaxY}px) scale(${textControls.textScale})`,
           opacity: isMusicStripHovered ? textControls.textOpacity : 0,
           zIndex: 2, // In front of B1 layer
           position: 'absolute',
@@ -428,7 +474,7 @@ const Experience = () => {
         }}
       >
         <img 
-          src="parallax/B1.png" 
+          src={getAssetPath('/parallax/B1.png')}
           alt="Background Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B1.png')}
@@ -470,8 +516,8 @@ const Experience = () => {
               position: 'absolute',
               top: `calc(50% + ${videoConfig.y}px)`,
               left: `calc(50% + ${videoConfig.x}px)`,
-              width: `${videoConfig.width}vw`,
-              height: `${videoConfig.height}vh`,
+              width: `${videoConfig.width}px`,
+              height: `${videoConfig.height}px`,
               transform: `translate(-50%, -50%) scale(${videoConfig.scale})`,
               objectFit: videoConfig.objectFit,
               zIndex: 0,
@@ -482,16 +528,16 @@ const Experience = () => {
             onLoadedData={e => { 
               e.target.play(); 
               e.target.volume = videoConfig.volume;
-              console.debug('Video loaded with audio:', 'video/tvintro.webm', 'Volume:', videoConfig.volume) 
+              console.debug('Video loaded with audio:', '/video/tvintro.webm', 'Volume:', videoConfig.volume) 
             }}
           >
-            <source src="video/tvintro.webm" type="video/webm" />
+            <source src={getAssetPath('/video/tvintro.webm')} type="video/webm" />
             Your browser does not support the video tag.
           </video>
         </div>
         {/* B2 image above video */}
         <img 
-          src="parallax/B2.png" 
+          src={getAssetPath('/parallax/B2.png')}
           alt="Middle Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B2.png')}
@@ -515,7 +561,7 @@ const Experience = () => {
         }}
       >
         <img 
-          src="parallax/B3.png" 
+          src={getAssetPath('/parallax/B3.png')} 
           alt="Front Layer" 
           onLoad={handleImageLoad}
           onError={() => handleImageError('B3.png')}
@@ -524,16 +570,21 @@ const Experience = () => {
 
 
 
-      {/* Photo Frames */}
-      <div>
-        {[...Array(15)].map((_, idx) => (
-          <PhotoFrame key={idx + 1} id={idx + 1} globalX={globalX} globalY={globalY} groupScale={groupScale} />
-        ))}
-      </div>
+      {/* Photo Frames - PhotoFrame renders all 15 frames itself (in one shared Canvas/
+          WebGL context), so it's mounted once here, not looped. It used to be rendered
+          15 times in a row, each instance independently drawing all 15 frames inside its
+          own Canvas (the `id` prop was never actually read by the component) - 15 fully
+          overlapping WebGL contexts each loading all 15 models redundantly. That's very
+          likely why Firefox (a much lower simultaneous-context limit than Chrome) failed
+          outright while Chrome merely struggled. */}
+      <PhotoFrame globalX={globalX} globalY={globalY} groupScale={groupScale} stageScale={scale} />
 
       {/* Content overlay for future frame positioning */}
       <div className="content-overlay" style={{ pointerEvents: 'none' }}>
         {/* Photo frames will be positioned here */}
+      </div>
+          </div>
+        </div>
       </div>
     </div>
   )

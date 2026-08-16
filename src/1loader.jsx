@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './index.css';
 import { useGlobalAudio } from './GlobalAudioContext.jsx';
+import { getAssetPath } from './utils/assetPath';
 
-const GIF_SRC = '/video/walkingmusicians.gif';
+const GIF_SRC = getAssetPath('/video/walkingmusicians.gif');
 
 // Button style constants from IntroLoader
 const LOADER_STYLE = {
@@ -202,8 +203,8 @@ const Page1Loader = ({ onNext }) => {
           transition: 'left 0.1s ease-out',
           zIndex: 10,
         }}>
-          <img 
-            src="/video/walkingmusicians.gif" 
+          <img
+            src={GIF_SRC}
             alt="Walking Musicians"
             style={{
               width: '192px', // Scaled up by 2x (96px * 2 = 192px)

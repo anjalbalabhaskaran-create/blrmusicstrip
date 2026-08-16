@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useRef, useState, useEffect } from 'react';
+import { getAssetPath } from './utils/assetPath';
 
 const AudioContext = createContext();
 
@@ -21,7 +22,7 @@ export const GlobalAudioProvider = ({ children }) => {
   useEffect(() => {
     if (!audioRef.current) {
       console.log('🎵 Initializing global audio with: /music/Intro music.m4a');
-      audioRef.current = new Audio('/music/Intro music.m4a'); // Changed from bg.m4a to Intro music.m4a
+      audioRef.current = new Audio(getAssetPath('/music/Intro music.m4a')); // Changed from bg.m4a to Intro music.m4a
       audioRef.current.loop = true;
       audioRef.current.volume = volume;
       audioRef.current.muted = isMuted;

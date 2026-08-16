@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAssetPath } from './utils/assetPath';
 
 const photoframeTexts = [
   'Memory 1', 'Memory 2', 'Memory 3', 'Memory 4', 'Memory 5',
@@ -36,7 +37,7 @@ const PhotoFrameGallery = () => {
       }}
     >
       <img
-        src={"/background image/loader background.png"}
+        src={getAssetPath("/background image/loader background.png")}
         alt="Background"
         style={{
           position: 'fixed',

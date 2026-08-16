@@ -1,9 +1,10 @@
 
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { getAssetPath } from '../utils/assetPath'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/models/Tree1.glb')
+  const { nodes, materials } = useGLTF(getAssetPath('/models/Tree1.glb'))
   return (
     <group {...props} dispose={null}>
       <mesh
